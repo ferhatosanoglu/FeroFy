@@ -3,13 +3,16 @@ import {
   View,
   Text
 } from 'react-native';
+import { Suspense } from 'react';
 import Navigation from './src/navigation/navigation';
 
 const App = () => {
 
   return (
     <View style={{ flex: 1 }}>
-      <Navigation />
+      <Suspense fallback={<></>}>
+        <Navigation />
+      </Suspense>
     </View>
   );
 };

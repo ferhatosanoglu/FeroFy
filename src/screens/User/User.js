@@ -2,56 +2,51 @@ import React, { useState } from 'react';
 import {
     View,
     Text,
-    ScrollView,
     Image,
-    Img,
+    TouchableOpacity,
     StyleSheet,
-    Button,
-    TouchableOpacity
+    Button
 } from 'react-native';
-import * as Queries from '../../utils/queries';
 import { routes } from '../../constants/routes';
-import useForm from '../../hooks/useForm';
 import ferofyLogo from '../../../assets/ferofyLogo.png';
 import emailLogo from '../../assets/img/Vector.png'
 import passwordLogo from '../../assets/img/password.png'
+import userLogo from '../../assets/img/user.png'
 import Input from '../../components/inputs/input';
 import * as yup from 'yup';
+import useForm from '../../hooks/useForm';
+import * as Queries from '../../utils/queries';
 import { useAtom } from 'jotai';
 import { userAtom } from '../../utils/atoms';
-
-
-
-
-const Login = ({ navigation }) => {
-    var validation = yup.object({
-        Email: yup
-            .string()
-            .email('Geçersiz e-posta adresi.')
-            .trim()
-            .required('Lütfen e-posta adresinizi giriniz.'),
-        Password: yup.string().trim().required('Lütfen parolanızı giriniz.'),
-    });
-    var { values, setValues, isValid, errors, isSubmitted, onFormSubmit } =
-        useForm({ Email: '', Password: '' }, validation);
+const User = ({ navigation }) => {
     const [user, setUser] = useAtom(userAtom);
-    const onLogin = async () => {
+    const onRegister = async () => {
         try {
-            const person = await Queries.Login(values)
-            if (person.data[0].id) {
-                setUser(person.data[0]);
+            const person = await Queries.Register(values)
+            if (person.data.id) {
+                setUser(person.data);
                 navigation.navigate(routes.Home)
 
             }
         } catch (err) {
             console.log(err)
         }
+    }
+    const onLogin = () => {
+        navigation.navigate(routes.Login)
+    }
+    var validation = yup.object({
+        email: yup
+            .string()
+            .email('Geçersiz e-posta adresi.')
+            .trim()
+            .required('Lütfen e-posta adresinizi giriniz.'),
+        password: yup.string().required('Lütfen parolanızı giriniz.'),
+        Name: yup.string().required('lutfen bosluklari doldurunuz')
+    });
+    var { values, setValues, isValid, errors, isSubmitted, onFormSubmit } =
+        useForm({ Email: '', Password: '', Name: '' }, validation);
 
-        console.log(user.data)
-    }
-    const onRegister = () => {
-        navigation.navigate(routes.Register)
-    }
     return (
         <View style={styles.container}>
             <View>
@@ -59,29 +54,30 @@ const Login = ({ navigation }) => {
                     resizeMode='contain'
                     style={styles.ferofyLogo}
                     source={ferofyLogo} />
-                <Text style={styles.Text}>Welcome to FeroFy Music</Text>
+                <Text style={styles.Text}>FeroFy Music</Text>
                 <View style={{ width: 300 }} >
+                    <Input title="Isim Soyisim"
+                        keyboardType="default"
+                        placeholder={'Isminiz Soyisminiz'}
+                        inputStyle={styles.Input} value={user.Name}
+                        img={userLogo}
+                        onChangeText={Name => setValues({ Name })} />
                     <Input title="E-Posta Adresi"
                         keyboardType="email-address"
                         placeholder={'Eposta Adresiniz'}
-                        keyboardType="email-address"
-                        inputStyle={styles.Input}
-                        value={values.Email}
+                        inputStyle={styles.Input} value={user.Email}
                         img={emailLogo}
                         onChangeText={Email => setValues({ Email })} />
-                    <Input title="sifre"
-                        keyboardType="default"
-                        img={passwordLogo}
+                    <Input title="Sifre"
                         placeholder={'Sifreniz'}
-                        inputStyle={styles.Input}
-                        value={values.Password}
                         secureTextEntry={true}
+                        inputStyle={styles.Input} value={values.Password}
+                        img={passwordLogo}
                         onChangeText={Password => setValues({ Password })} />
                 </View>
                 <TouchableOpacity style={styles.button} onPress={
-                    onLogin
-                }><Text style={{ fontSize: 20, color: '#fff' }}>Giris Yap</Text></TouchableOpacity>
-                <Button title='Üye ol' onPress={onRegister} />
+                    onRegister
+                }><Text style={{ fontSize: 20, color: '#fff' }}>Kaydet</Text></TouchableOpacity>
             </View>
         </View >
     );
@@ -125,4 +121,4 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     }
 })
-export default Login;
+export default User;
